@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Discipline Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-purple: #9b8cc4;       
+    --box-grey: #585065;        
+    --pill-light: #a698cc;      
+    --text-dark: #3b334d;       
+    --text-white: #ffffff;      
+    --font-head: 'Barlow Condensed', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-body); }
+  
+  body, html {
+    width: 100%; height: 100%;
+    background-color: var(--bg-purple);
+    overflow: hidden;
+    display: flex; justify-content: center; align-items: center;
+    color: var(--text-white);
+  }
+
+  #app {
+    position: relative;
+    width: 100%; max-width: 420px; height: 100%;
+    background-color: var(--bg-purple);
+    overflow: hidden;
+  }
+
+  .screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(20px);
+  }
+  .screen.active {
+    opacity: 1; pointer-events: all; transform: translateX(0);
+  }
+
+  #welcome-screen h1 {
+    font-family: var(--font-head);
+    font-size: 4rem; font-weight: 900;
+    color: var(--text-dark);
+    letter-spacing: 2px;
+  }
+
+  .custom-logo { 
+    width: 220px; /* Made the logo bigger as requested */
+    height: auto; 
+    margin-bottom: 40px; 
+    object-fit: contain;
+    filter: drop-shadow(0px 8px 20px rgba(0,0,0,0.1));
+  }
+  
+  .toggle-container { width: 85%; display: flex; flex-direction: column; gap: 20px; }
+  
+  .toggle-btn {
+    width: 100%; height: 75px;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 999px; border: none; cursor: pointer;
+    display: flex; align-items: center; padding: 0 12px;
+    position: relative; transition: transform 0.2s, background 0.3s;
+    justify-content: flex-start; /* Default for the icon alignment */
+  }
+  .toggle-btn:active { transform: scale(0.96); }
+  
+  .icon-circle {
+    width: 55px; height: 55px;
+    border-radius: 50%;
+    background: white;
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .toggle-btn svg { width: 32px; height: 32px; fill: var(--text-dark); stroke: var(--text-dark); stroke-width: 2; }
+
+  /* Label styles for Morning and Night text */
+  .btn-label {
+    font-family: var(--font-head);
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-dark);
+    text-transform: uppercase;
+    margin-left: 15px;
+  }
+  
+  /* Overrides for specific buttons */
+  .sun-btn { justify-content: flex-start; }
+  .moon-btn { justify-content: flex-end; }
+  .moon-btn .btn-label { margin-left: 0; margin-right: 15px; }
+
+  .form-layout {
+    width: 100%; height: 100%;
+    padding: 40px 20px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .header-row {
+    width: 100%; max-width: 340px;
+    display: flex; align-items: center;
+    margin-bottom: 20px;
+  }
+  .back-btn {
+    background: none; border: none;
+    font-size: 2.5rem; font-weight: 900; font-family: var(--font-head);
+    color: var(--text-dark); cursor: pointer; margin-right: 15px;
+  }
+  .page-title {
+    font-family: var(--font-head); font-size: 3.2rem; font-weight: 900;
+    color: var(--text-dark); line-height: 1; letter-spacing: 1px;
+  }
+
+  .dark-card {
+    background-color: var(--box-grey);
+    width: 100%; max-width: 350px;
+    border-radius: 40px; 
+    padding: 25px 20px;
+    display: flex; flex-direction: column; gap: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  .pill-input {
+    width: 100%; height: 55px;
+    background-color: var(--pill-light);
+    border-radius: 999px; border: none;
+    padding: 0 25px;
+    font-family: var(--font-head); font-size: 1.6rem; font-weight: 700;
+    color: var(--text-white); outline: none;
+    transition: all 0.3s ease;
+  }
+  .pill-input::placeholder { color: rgba(255,255,255,0.7); }
+  
+  .pill-input:focus, .pill-input:not(:placeholder-shown) {
+    background: linear-gradient(90deg, #ffffff 0%, #ffffff 50%, var(--pill-light) 100%);
+    color: var(--text-dark); 
+  }
+
+  .add-more {
+    background: none; border: none;
+    font-family: var(--font-head); font-size: 1.4rem; font-weight: 700;
+    color: var(--text-white); margin-top: 10px; cursor: pointer; text-align: center;
+    opacity: 0.8;
+  }
+
+  .submit-icon-wrapper {
+    margin-top: auto; margin-bottom: 30px;
+    cursor: pointer; opacity: 0.3; transition: all 0.3s;
+    pointer-events: none;
+  }
+  .submit-icon-wrapper.active { opacity: 1; pointer-events: all; transform: scale(1.1); }
+  .submit-icon-wrapper svg { width: 65px; height: 65px; stroke: var(--box-grey); fill: transparent; stroke-width: 2;}
+  .submit-icon-wrapper.moon-submit svg { fill: var(--box-grey); stroke: none; }
+
+  #success-screen p {
+    font-family: var(--font-head); font-size: 2.2rem; font-weight: 800;
+    color: var(--text-dark); margin-top: 25px; letter-spacing: 2px; text-transform: uppercase;
+    text-align: center;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div class="screen active" id="welcome-screen">
+    <h1>Welcome...</h1>
+  </div>
+
+  <div class="screen" id="selection-screen">
+    <img src="https://raw.githubusercontent.com/mustaphahabib560-eng/ROGUE/main/Plan%20de%20travail%207.png" class="custom-logo" alt="Logo">
+    
+    <div class="toggle-container">
+      <button class="toggle-btn sun-btn" onclick="goTo('morning-screen')">
+        <div class="icon-circle">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/></svg>
+        </div>
+        <div class="btn-label">MORNING</div> </button>
+      <button class="toggle-btn moon-btn" onclick="goTo('night-screen')">
+        <div class="btn-label">NIGHT</div> <div class="icon-circle">
+          <svg viewBox="0 0 24 24" fill="var(--text-dark)" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="screen" id="morning-screen">
+    <div class="form-layout">
+      <div class="header-row">
+        <button class="back-btn" onclick="goTo('selection-screen')">&lt;</button>
+        <h2 class="page-title">Check list ...</h2>
+      </div>
+      <div class="dark-card" id="morning-fields"></div>
+      <div class="submit-icon-wrapper" id="morning-submit" onclick="submitData('Morning')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="night-screen">
+    <div class="form-layout">
+      <div class="header-row">
+        <button class="back-btn" onclick="goTo('selection-screen')">&lt;</button>
+        <h2 class="page-title">Check up ...</h2>
+      </div>
+      <div class="dark-card" id="night-fields"></div>
+      <div class="submit-icon-wrapper moon-submit" id="night-submit" onclick="submitData('Night')">
+         <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="success-screen">
+    <img src="https://raw.githubusercontent.com/mustaphahabib560-eng/ROGUE/main/Plan%20de%20travail%207.png" class="custom-logo" alt="Logo">
+    <p>Logged . <br>Stay Disciplined .</p>
+  </div>
+
+</div>
+
+<script>
+  const WEBHOOK_URL = 'https://YOUR_N8N_URL_HERE/webhook/id'; 
+
+  const nightLabels = ['Phone', 'Workout', 'Scroll', 'Prayer', 'tasks', 'Sleep', 'reading', 'Mental'];
+  let morningCount = 6;
+
+  function goTo(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  }
+
+  function createInput(placeholderText, id) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'pill-input';
+    input.placeholder = placeholderText;
+    input.id = id;
+    input.addEventListener('input', checkValidation);
+    return input;
+  }
+
+  function renderMorning() {
+    const container = document.getElementById('morning-fields');
+    container.innerHTML = '';
+    for(let i=1; i<=morningCount; i++) {
+      container.appendChild(createInput(`${i}`, `m_task_${i}`));
+    }
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-more';
+    addBtn.innerText = 'Add more ...';
+    addBtn.onclick = () => { morningCount++; renderMorning(); checkValidation(); };
+    container.appendChild(addBtn);
+  }
+
+  function renderNight() {
+    const container = document.getElementById('night-fields');
+    container.innerHTML = '';
+    nightLabels.forEach((label, idx) => {
+      container.appendChild(createInput(label, `n_field_${idx}`));
+    });
+  }
+
+  function checkValidation() {
+    let nightValid = true;
+    nightLabels.forEach((_, idx) => {
+      const field = document.getElementById(`n_field_${idx}`);
+      if(field && !field.value.trim()) nightValid = false;
+    });
+    document.getElementById('night-submit').classList.toggle('active', nightValid);
+
+    let morningValid = false;
+    for(let i=1; i<=morningCount; i++) {
+      const field = document.getElementById(`m_task_${i}`);
+      if(field && field.value.trim()) morningValid = true;
+    }
+    document.getElementById('morning-submit').classList.toggle('active', morningValid);
+  }
+
+  function submitData(type) {
+    let payload = { form_type: type, timestamp: new Date().toISOString() };
+    if(type === 'Night') {
+      nightLabels.forEach((label, idx) => {
+        payload[label.toLowerCase()] = document.getElementById(`n_field_${idx}`).value.trim();
+      });
+    } else {
+      payload.tasks = [];
+      for(let i=1; i<=morningCount; i++) {
+        const val = document.getElementById(`m_task_${i}`).value.trim();
+        if(val) payload.tasks.push(val);
+      }
+    }
+
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(e => console.error('Webhook Error:', e));
+
+    goTo('success-screen');
+    
+    setTimeout(() => {
+      document.querySelectorAll('.pill-input').forEach(i => i.value = '');
+      morningCount = 6; renderMorning(); checkValidation();
+      goTo('selection-screen');
+    }, 3500);
+  }
+
+  window.onload = () => {
+    renderMorning();
+    renderNight();
+    setTimeout(() => goTo('selection-screen'), 2000); 
+  };
+</script>
+</body>
+</html>
