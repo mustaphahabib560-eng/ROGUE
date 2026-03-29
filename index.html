@@ -2,8 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <meta name="color-scheme" content="only light">
-<meta name="supported-color-schemes" content="light">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Discipline Engine</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
@@ -21,28 +19,42 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-body); }
   
   body, html {
-  width: 100%; height: 100%;
-  background-color: #9b8cc4 !important; /* Added !important */
-  -webkit-text-size-adjust: 100%; /* Prevents font scaling which can shift layout */
-  image-rendering: -webkit-optimize-contrast; /* Keeps the logo sharp */
-  overflow: hidden;
-}
+    width: 100%; height: 100%;
+    background-color: var(--bg-purple);
+    display: flex; justify-content: center; align-items: center;
+    color: var(--text-white);
+    overflow: hidden; /* Keeps the browser window steady */
+  }
 
   #app {
     position: relative;
     width: 100%; max-width: 420px; height: 100%;
     background-color: var(--bg-purple);
-    overflow: hidden;
+    overflow: hidden; 
   }
 
   .screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; 
+    padding-top: 40px; /* Space from top */
     opacity: 0; pointer-events: none; transition: opacity 0.4s ease, transform 0.4s ease;
     transform: translateX(20px);
+    
+    /* ───── SCROLLING LOGIC ───── */
+    overflow-y: auto; 
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
   }
+  .screen::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
   .screen.active {
     opacity: 1; pointer-events: all; transform: translateX(0);
+  }
+
+  /* ───── WELCOME & SELECTION (Centered) ───── */
+  #welcome-screen, #selection-screen, #success-screen {
+    justify-content: center;
+    padding-top: 0;
   }
 
   #welcome-screen h1 {
@@ -53,11 +65,12 @@
   }
 
   .custom-logo { 
-    width: 220px; /* Made the logo bigger as requested */
+    width: 220px; 
     height: auto; 
     margin-bottom: 40px; 
+    flex-shrink: 0;
     object-fit: contain;
-    filter: drop-shadow(0px 8px 20px rgba(0,0,0,0.1));
+    filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.1));
   }
   
   .toggle-container { width: 85%; display: flex; flex-direction: column; gap: 20px; }
@@ -67,8 +80,7 @@
     background: rgba(255, 255, 255, 0.35);
     border-radius: 999px; border: none; cursor: pointer;
     display: flex; align-items: center; padding: 0 12px;
-    position: relative; transition: transform 0.2s, background 0.3s;
-    justify-content: flex-start; /* Default for the icon alignment */
+    position: relative; transition: transform 0.2s;
   }
   .toggle-btn:active { transform: scale(0.96); }
   
@@ -81,31 +93,30 @@
   }
   .toggle-btn svg { width: 32px; height: 32px; fill: var(--text-dark); stroke: var(--text-dark); stroke-width: 2; }
 
-  /* Label styles for Morning and Night text */
   .btn-label {
     font-family: var(--font-head);
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: var(--text-dark);
-    text-transform: uppercase;
+    font-size: 2.2rem; font-weight: 800;
+    color: var(--text-dark); text-transform: uppercase;
     margin-left: 15px;
   }
   
-  /* Overrides for specific buttons */
   .sun-btn { justify-content: flex-start; }
   .moon-btn { justify-content: flex-end; }
   .moon-btn .btn-label { margin-left: 0; margin-right: 15px; }
 
+  /* ───── FORM LAYOUT ───── */
   .form-layout {
-    width: 100%; height: 100%;
-    padding: 40px 20px;
+    width: 100%; 
+    padding: 0 20px 40px 20px; /* Extra bottom padding for the submit button */
     display: flex; flex-direction: column; align-items: center;
+    min-height: min-content;
   }
 
   .header-row {
     width: 100%; max-width: 340px;
     display: flex; align-items: center;
     margin-bottom: 20px;
+    flex-shrink: 0;
   }
   .back-btn {
     background: none; border: none;
@@ -124,6 +135,7 @@
     padding: 25px 20px;
     display: flex; flex-direction: column; gap: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    margin-bottom: 30px;
   }
 
   .pill-input {
@@ -146,13 +158,13 @@
     background: none; border: none;
     font-family: var(--font-head); font-size: 1.4rem; font-weight: 700;
     color: var(--text-white); margin-top: 10px; cursor: pointer; text-align: center;
-    opacity: 0.8;
   }
 
   .submit-icon-wrapper {
-    margin-top: auto; margin-bottom: 30px;
     cursor: pointer; opacity: 0.3; transition: all 0.3s;
     pointer-events: none;
+    margin-top: 10px;
+    flex-shrink: 0;
   }
   .submit-icon-wrapper.active { opacity: 1; pointer-events: all; transform: scale(1.1); }
   .submit-icon-wrapper svg { width: 65px; height: 65px; stroke: var(--box-grey); fill: transparent; stroke-width: 2;}
@@ -176,15 +188,16 @@
 
   <div class="screen" id="selection-screen">
     <img src="https://raw.githubusercontent.com/mustaphahabib560-eng/ROGUE/main/Plan%20de%20travail%207.png" class="custom-logo" alt="Logo">
-    
     <div class="toggle-container">
       <button class="toggle-btn sun-btn" onclick="goTo('morning-screen')">
         <div class="icon-circle">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/></svg>
         </div>
-        <div class="btn-label">MORNING</div> </button>
+        <div class="btn-label">MORNING</div>
+      </button>
       <button class="toggle-btn moon-btn" onclick="goTo('night-screen')">
-        <div class="btn-label">NIGHT</div> <div class="icon-circle">
+        <div class="btn-label">NIGHT</div>
+        <div class="icon-circle">
           <svg viewBox="0 0 24 24" fill="var(--text-dark)" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </div>
       </button>
@@ -233,6 +246,7 @@
   function goTo(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
+    document.getElementById(screenId).scrollTop = 0; // Reset scroll to top when changing screens
   }
 
   function createInput(placeholderText, id) {
