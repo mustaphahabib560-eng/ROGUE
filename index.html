@@ -7,24 +7,42 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-purple: #9b8cc4;       
-    --box-grey: #585065;        
-    --pill-light: #a698cc;      
-    --text-dark: #3b334d;       
-    --text-white: #ffffff;      
-    --font-head: 'Barlow Condensed', sans-serif;
-    --font-body: 'Nunito', sans-serif;
-  }
+  /* 1. Force the browser to use a standard color profile */
+  color-scheme: light only;
+  --bg-purple: #9b8cc4;       
+  --box-grey: #585065;        
+  --pill-light: #a698cc;      
+  --text-dark: #3b334d;       
+  --text-white: #ffffff;      
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-body); }
-  
-  body, html {
-    width: 100%; height: 100%;
-    background-color: var(--bg-purple);
-    display: flex; justify-content: center; align-items: center;
-    color: var(--text-white);
-    overflow: hidden; /* Keeps the browser window steady */
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+  /* 2. Stop mobile browsers from scaling text or colors on their own */
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body, html {
+  width: 100%; 
+  height: 100%;
+  /* 3. The '!important' forces GitHub's hosting to prioritize your color */
+  background-color: #9b8cc4 !important; 
+  /* 4. This stops "True Tone" or "Night Shift" from over-adjusting the page */
+  color-interpolation-filters: sRGB;
+  image-rendering: -webkit-optimize-contrast;
+  overflow: hidden;
+}
+
+/* 5. Force specific color rendering for Chrome/Safari mobile */
+@media screen {
+  body {
+    background-image: none !important;
+    background-color: #9b8cc4 !important;
   }
+}
 
   #app {
     position: relative;
